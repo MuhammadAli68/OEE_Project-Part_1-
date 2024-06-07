@@ -1,0 +1,16 @@
+{
+  "name": "node_scheduler",
+  "version": "1.0.0",
+  "description": "",
+  "main": "myScheduler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chokidar": "^3.6.0",
+    "node-cron": "^3.0.3"
+  }
+}
