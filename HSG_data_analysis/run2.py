@@ -122,7 +122,7 @@ if __name__ == "__main__":
 #   "T:/HSG/HSG Nest Run Data/HSG 7 Nest Run Data",
 #   "T:/HSG/HSG Nest Run Data/HSG 8 Nest Run Data"
 # ]
-#     DayofWeek = 3
+#     DayofWeek = 1
 #     ShiftNumber = "Shift1"
     folders = json.loads(sys.argv[1])
     DayofWeek = int(sys.argv[2])
