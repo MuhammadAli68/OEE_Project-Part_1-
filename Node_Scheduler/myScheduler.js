@@ -35,7 +35,7 @@ async function processFolders(shift) {
 // Function to run Python process and return a promise
 function runPythonProcess(folderList, shift) {
   return new Promise((resolve, reject) => {
-    const pythonProcess = spawn('python', [
+    const pythonProcess = spawn('python3.12', [
       "../HSG_data_analysis/run2.py",
       JSON.stringify(folderList.map(folder => laser_folder_path_dir + folder)),
       getDayOfWeek(),
