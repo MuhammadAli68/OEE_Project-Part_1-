@@ -45,18 +45,23 @@ def Create_File(folder, file):
     # Drop duplicates, keeping the last occurrence based on "File Name" and "Start Time"
     df = df.drop_duplicates(subset=["File Name", "Start Time"], keep="last")
 
-    sumdf_includes_shift = df.groupby(["DateIso", "Shift"])["Total Time"].sum()
+    # Shift 0 does not get included in calculation of utilization.
+    filtered_df = df[df['Shift'] != 0]
+
+    # if no unfinished jobs exist, proceed without calculating utilization
+    if(filtered_df.size == 0):
+        return
+
+    sumdf_includes_shift = filtered_df.groupby(["DateIso", "Shift"])["Total Time"].sum()
     sumdf_includes_shift = pandas.DataFrame(sumdf_includes_shift).reset_index()
     sumdf_includes_shift["Total Time HMS"] = sumdf_includes_shift["Total Time"].map(getHMS)
     sumdf_includes_shift["Utilization"] = sumdf_includes_shift["Total Time"] / (10 * 60 * 60)
     
     friday_mask = sumdf_includes_shift['DateIso'].apply(lambda x: x.isoweekday() == 5)
     sumdf_includes_shift.loc[friday_mask, 'Utilization'] = sumdf_includes_shift.loc[friday_mask, 'Total Time'] / (8 * 60 * 60)
-    sumdf_includes_shift.loc[sumdf_includes_shift["Shift"] == 0, "Utilization"] = sumdf_includes_shift.loc[sumdf_includes_shift["Shift"] == 0, "Total Time"] / (4 * 60 * 60)
-
+    # sumdf_includes_shift.loc[sumdf_includes_shift["Shift"] == 0, "Utilization"] = sumdf_includes_shift.loc[sumdf_includes_shift["Shift"] == 0, "Total Time"] / (4 * 60 * 60)
     sumdf_includes_shift.to_csv(outputfile_per_shift, index=False)
-
-    filtered_df = df[df['Shift'] != 0]
+    
     sumdf = filtered_df.groupby(["DateIso"])["Total Time"].sum()
     sumdf = pandas.DataFrame(sumdf).reset_index()
     sumdf["Total Time HMS"] = sumdf["Total Time"].map(getHMS)
@@ -112,21 +117,21 @@ def worker(folder, DayofWeek, ShiftNumber):
 
 
 if __name__ == "__main__":
-#     folders = [
-#   "T:/HSG/HSG Nest Run Data/HSG 1 Nest Run Data",
-#   "T:/HSG/HSG Nest Run Data/HSG 2 Nest Run Data",
-#   #"/HSG 3 Nest Run Data",
-#   "T:/HSG/HSG Nest Run Data/HSG 4 Nest Run Data",
-#   "T:/HSG/HSG Nest Run Data/HSG 5 Nest Run Data",
-#   "T:/HSG/HSG Nest Run Data/HSG 6 Nest Run Data",
-#   "T:/HSG/HSG Nest Run Data/HSG 7 Nest Run Data",
-#   "T:/HSG/HSG Nest Run Data/HSG 8 Nest Run Data"
-# ]
-#     DayofWeek = 1
-#     ShiftNumber = "Shift1"
-    folders = json.loads(sys.argv[1])
-    DayofWeek = int(sys.argv[2])
-    ShiftNumber = sys.argv[3]
+    folders = [
+#  "T:/HSG/HSG Nest Run Data/HSG 1 Nest Run Data",
+#  "T:/HSG/HSG Nest Run Data/HSG 2 Nest Run Data",
+  #"/HSG 3 Nest Run Data",
+#  "T:/HSG/HSG Nest Run Data/HSG 4 Nest Run Data",
+#  "T:/HSG/HSG Nest Run Data/HSG 5 Nest Run Data",
+#  "T:/HSG/HSG Nest Run Data/HSG 6 Nest Run Data",
+  "T:/HSG/HSG Nest Run Data/HSG 7 Nest Run Data",
+#  "T:/HSG/HSG Nest Run Data/HSG 8 Nest Run Data"
+]
+    DayofWeek = 1
+    ShiftNumber = "Shift1"
+    # folders = json.loads(sys.argv[1])
+    # DayofWeek = int(sys.argv[2])
+    # ShiftNumber = sys.argv[3]
     current_date = dt.datetime.now().date() # making this global so that all threads see the same date.
     print("current date: ",current_date)
 
