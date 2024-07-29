@@ -3,6 +3,8 @@ const eventEmitter = new EventEmitter();
 const cron = require('node-cron');
 // const { ChildProcess } = require('child_process');
 const spawn = require("child_process").spawn;
+const { main } = require('../BystronicDataExtraction/DataPull.js');
+const { connectAndQuery } = require('./DataBaseQueries/DB.js');
 
 laser_folder_path_dir  = "../data/HSG/HSG Nest Run Data"; //"T:/HSG/HSG Nest Run Data"
 laser_folder_list = [
@@ -61,7 +63,8 @@ cron.schedule('0 4 * * 2-5', () => {
   console.log('Running at 4am Monday to Thursday');
   const shift = "Shift0";
   processFolders(shift);
-  //eventEmitter.emit("");
+  // Collect Bystronic laser data
+  main();
 });
 
 // Schedule for Monday to Thursday at 2pm
@@ -69,7 +72,8 @@ cron.schedule('0 14 * * 1-4', () => {
   console.log('Running at 2pm Monday to Thursday');
   const shift = "Shift1";
   processFolders(shift);
-  //eventEmitter.emit("");
+  // Collect Bystronic laser data
+  main();
 });
 
 // Schedule for Monday to Thursday at 11 59 59pm
@@ -77,7 +81,10 @@ cron.schedule('59 59 23 * * 1-4', () => {
   console.log('Running at 12am Monday to Thursday');
   const shift = "Shift2";
   processFolders(shift);
-  //eventEmitter.emit("");
+  // Collect Bystronic laser data
+  main();
+  //sql queries
+  connectAndQuery();
 });
 
 // Schedule for Friday at 12pm
@@ -85,7 +92,8 @@ cron.schedule('0 12 * * 5', () => {
   console.log('Running at 12pm on Friday');
   const shift = "Shift1";
   processFolders(shift);
-  //eventEmitter.emit("");
+  // Collect Bystronic laser data
+  main();
 });
 
 // Schedule for Friday at 8pm
@@ -93,7 +101,10 @@ cron.schedule('0 20 * * 5', () => {
   console.log('Running at 8pm on Friday');
   const shift = "Shift2";
   processFolders(shift);
-  //eventEmitter.emit("");
+  // Collect Bystronic laser data
+  main();
+  //sql queries
+  connectAndQuery();
 });
 
 
