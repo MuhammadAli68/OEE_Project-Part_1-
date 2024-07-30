@@ -69,4 +69,4 @@ ALTER TABLE [dbo].[Bystronic12K] ADD  Utilization AS (
         console.error(err.message);
     }
 }
-module.exports = connectAndQuery();
+module.exports = { connectAndQuery } ;

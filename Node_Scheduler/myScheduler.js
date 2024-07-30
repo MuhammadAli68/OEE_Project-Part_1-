@@ -3,7 +3,7 @@ const eventEmitter = new EventEmitter();
 const cron = require('node-cron');
 // const { ChildProcess } = require('child_process');
 const spawn = require("child_process").spawn;
-const { main } = require('../BystronicDataExtraction/DataPull.js');
+const { main } = require('./BystronicDataExtraction/DataPull.js');
 const { connectAndQuery } = require('./DataBaseQueries/DB.js');
 
 laser_folder_path_dir  = "../data/HSG/HSG Nest Run Data"; //"T:/HSG/HSG Nest Run Data"
@@ -77,7 +77,7 @@ cron.schedule('0 14 * * 1-4', () => {
 });
 
 // Schedule for Monday to Thursday at 11 59 59pm
-cron.schedule('59 59 23 * * 1-4', () => {
+cron.schedule('59 59 11 * * 1-4', () => {
   console.log('Running at 12am Monday to Thursday');
   const shift = "Shift2";
   processFolders(shift);
