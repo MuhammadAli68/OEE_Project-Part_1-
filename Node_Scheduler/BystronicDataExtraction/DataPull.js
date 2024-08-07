@@ -1,5 +1,5 @@
 const node_opc = require('node-opcua-client');
-const { AttributeIds } = require("node-opcua-client");
+const { AttributeId,  MessageSecurityMode, SecurityPolicy } = require("node-opcua-client");
 const sql = require('mssql');
 
 const config  = require('../DataBaseQueries/config.js');
