@@ -13,6 +13,8 @@ const connectionStrategy = {
 const client = node_opc.OPCUAClient.create({
     applicationName: "MyClient",
     connectionStrategy: connectionStrategy,
+    securityMode: MessageSecurityMode.None,
+    securityPolicy: SecurityPolicy.None,
     endpointMustExist: false
 });
 
