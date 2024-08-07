@@ -1,5 +1,5 @@
 const node_opc = require('node-opcua-client');
-const { AttributeId,  MessageSecurityMode, SecurityPolicy } = require("node-opcua-client");
+const { AttributeIds,  MessageSecurityMode, SecurityPolicy } = require("node-opcua-client");
 const sql = require('mssql');
 
 const config  = require('../DataBaseQueries/config.js');
@@ -15,6 +15,7 @@ const client = node_opc.OPCUAClient.create({
     connectionStrategy: connectionStrategy,
     securityMode: MessageSecurityMode.None,
     securityPolicy: SecurityPolicy.None,
+    keepSessionAlive:false,
     endpointMustExist: false
 });
 

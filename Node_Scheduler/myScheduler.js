@@ -77,7 +77,7 @@ cron.schedule('0 14 * * 1-4', () => {
 });
 
 // Schedule for Monday to Thursday at 11 59 59pm
-cron.schedule('59 59 11 * * 1-4', () => {
+cron.schedule('59 59 23 * * 1-4', () => {
   console.log('Running at 12am Monday to Thursday');
   const shift = "Shift2";
   processFolders(shift);
