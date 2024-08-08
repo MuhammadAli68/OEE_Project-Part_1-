@@ -7,7 +7,7 @@ const endpointUrl = "opc.tcp://192.168.110.15:56000";
 
 const connectionStrategy = {
     initialDelay: 1000,
-    maxRetry: 1
+    maxRetry: 0
 };
 
 const client = node_opc.OPCUAClient.create({
