@@ -58,53 +58,55 @@ function runPythonProcess(folderList, shift) {
   });
 }
 
+// Generalized function to handle the cron job workflow
+async function handleCronJob(shift) {
+  try {
+    // Step 1: Process folders
+    await processFolders(shift);
+    
+    // Step 2: Collect Bystronic laser data
+    await main();
+
+    // Step 3: Execute SQL queries if it's the right time
+    if (shift === 'Shift2') {
+      await connectAndQuery();
+    }
+    
+    console.log('All tasks completed successfully.');
+  } catch (error) {
+    console.error('An error occurred during the cron job:', error);
+  }
+}
+
 // Schedule for Tuesday to Friday at 4am
 cron.schedule('0 4 * * 2-5', () => {
   console.log('Running at 4am Monday to Thursday');
-  const shift = "Shift0";
-  processFolders(shift);
-  // Collect Bystronic laser data
-  main();
+  handleCronJob("Shift0");
 });
 
 // Schedule for Monday to Thursday at 2pm
 cron.schedule('0 14 * * 1-4', () => {
   console.log('Running at 2pm Monday to Thursday');
-  const shift = "Shift1";
-  processFolders(shift);
-  // Collect Bystronic laser data
-  main();
+  handleCronJob("Shift1");
 });
 
 // Schedule for Monday to Thursday at 11 59 59pm
 cron.schedule('59 59 23 * * 1-4', () => {
   console.log('Running at 12am Monday to Thursday');
   const shift = "Shift2";
-  processFolders(shift);
-  // Collect Bystronic laser data
-  main();
-  //sql queries
-  connectAndQuery();
+  handleCronJob("Shift2");
 });
 
 // Schedule for Friday at 12pm
 cron.schedule('0 12 * * 5', () => {
   console.log('Running at 12pm on Friday');
-  const shift = "Shift1";
-  processFolders(shift);
-  // Collect Bystronic laser data
-  main();
+  handleCronJob("Shift1");
 });
 
 // Schedule for Friday at 8pm
 cron.schedule('0 20 * * 5', () => {
   console.log('Running at 8pm on Friday');
-  const shift = "Shift2";
-  processFolders(shift);
-  // Collect Bystronic laser data
-  main();
-  //sql queries
-  connectAndQuery();
+  handleCronJob("Shift2");
 });
 
 
