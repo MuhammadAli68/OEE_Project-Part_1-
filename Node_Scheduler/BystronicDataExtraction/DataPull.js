@@ -10,21 +10,21 @@ const connectionStrategy = {
     maxRetry: 0
 };
 
-const client = node_opc.OPCUAClient.create({
-    applicationName: "MyClient",
-    connectionStrategy: connectionStrategy,
-    securityMode: MessageSecurityMode.None,
-    securityPolicy: SecurityPolicy.None,
-    keepSessionAlive:false,
-    endpointMustExist: false
-});
-
 async function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 async function main() {
     try {
+        const client = node_opc.OPCUAClient.create({
+            applicationName: "MyClient",
+            connectionStrategy: connectionStrategy,
+            securityMode: MessageSecurityMode.None,
+            securityPolicy: SecurityPolicy.None,
+            keepSessionAlive:false,
+            endpointMustExist: false
+        });
+
         // step 1 : connect to OPC UA server
         await client.connect(endpointUrl);
         console.log("connected !");

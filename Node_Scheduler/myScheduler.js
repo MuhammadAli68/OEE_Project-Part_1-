@@ -6,7 +6,7 @@ const spawn = require("child_process").spawn;
 const { main } = require('./BystronicDataExtraction/DataPull.js');
 const { connectAndQuery } = require('./DataBaseQueries/DB.js');
 
-laser_folder_path_dir  = "../data/HSG/HSG Nest Run Data"; //"T:/HSG/HSG Nest Run Data"
+laser_folder_path_dir  = "../data/HSG/HSG Nest Run DataT:/HSG/HSG Nest Run Data"; //"T:/HSG/HSG Nest Run Data"
 laser_folder_list = [
   "/HSG 1 Nest Run Data",
   "/HSG 2 Nest Run Data",
@@ -62,10 +62,10 @@ function runPythonProcess(folderList, shift) {
 async function handleCronJob(shift) {
   try {
     // Step 1: Process folders
-    await processFolders(shift);
+    await main();
     
     // Step 2: Collect Bystronic laser data
-    await main();
+    await processFolders(shift);
 
     // Step 3: Execute SQL queries if it's the right time
     if (shift === 'Shift2') {
@@ -108,7 +108,6 @@ cron.schedule('0 20 * * 5', () => {
   console.log('Running at 8pm on Friday');
   handleCronJob("Shift2");
 });
-
 
 // const fs = require('fs');
 // const chokidar = require('chokidar');
