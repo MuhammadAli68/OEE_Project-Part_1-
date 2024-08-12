@@ -1,5 +1,5 @@
 module.exports = {
-    user: process.env.DB_USER, // better stored in an app setting such as 
+    user: process.env.DB_USER, // better stored in an app setting such as process.env.DB_USER
     password: process.env.DB_PASSWORD, // better stored in an app setting such as process.env.DB_PASSWORD
     server: process.env.DB_SERVER, // better stored in an app setting such as process.env.DB_SERVER
     port: Number(process.env.DB_PORT), // optional, defaults to 1433, better stored in an app setting such as process.env.DB_PORT

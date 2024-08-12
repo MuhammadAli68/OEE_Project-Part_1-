@@ -62,8 +62,9 @@ function runPythonProcess(folderList, shift) {
 async function handleCronJob(shift) {
   try {
     // Step 1: Process folders
+    console.time('Processing Time for bystronic12K data pull');
     await main();
-    
+    console.timeEnd('Processing Time for bystronic12K data pull');
     // Step 2: Collect Bystronic laser data
     await processFolders(shift);
 
@@ -90,8 +91,8 @@ cron.schedule('0 14 * * 1-4', () => {
   handleCronJob("Shift1");
 });
 
-// Schedule for Monday to Thursday at 11 59 59pm
-cron.schedule('59 59 23 * * 1-4', () => {
+// Schedule for Monday to Thursday at 11 59 55pm. To compensate delay caused by Bystronic data extraction.
+cron.schedule('55 59 23 * * 1-4', () => {
   console.log('Running at 12am Monday to Thursday');
   const shift = "Shift2";
   handleCronJob("Shift2");
