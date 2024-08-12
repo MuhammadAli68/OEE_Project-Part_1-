@@ -6,7 +6,7 @@ const spawn = require("child_process").spawn;
 const { main } = require('./BystronicDataExtraction/DataPull.js');
 const { connectAndQuery } = require('./DataBaseQueries/DB.js');
 
-laser_folder_path_dir  = "../data/HSG/HSG Nest Run DataT:/HSG/HSG Nest Run Data"; //"T:/HSG/HSG Nest Run Data"
+laser_folder_path_dir  = "../data/HSG/HSG Nest Run Data"; //"T:/HSG/HSG Nest Run Data"
 laser_folder_list = [
   "/HSG 1 Nest Run Data",
   "/HSG 2 Nest Run Data",
