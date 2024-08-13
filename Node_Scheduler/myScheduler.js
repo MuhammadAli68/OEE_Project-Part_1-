@@ -23,10 +23,10 @@ function getDayOfWeek() {
 }
 
 // Function to handle the async loop with delay
-async function processFolders(shift) {
+async function processFolders(shift,current_date) {
   console.time('Processing Time for batch size 20');
   try {
-    const result = await runPythonProcess(laser_folder_list, shift);
+    const result = await runPythonProcess(laser_folder_list, shift, current_date);
     console.log(result);
   } catch (error) {
     console.error(error);
@@ -35,13 +35,14 @@ async function processFolders(shift) {
 }
 
 // Function to run Python process and return a promise
-function runPythonProcess(folderList, shift) {
+function runPythonProcess(folderList, shift, current_date) {
   return new Promise((resolve, reject) => {
     const pythonProcess = spawn('python3.12', [
       "../HSG_data_analysis/run2.py",
       JSON.stringify(folderList.map(folder => laser_folder_path_dir + folder)),
       getDayOfWeek(),
-      shift
+      shift,
+      current_date
     ]);
 
     pythonProcess.stdout.on('data', (data) => {
@@ -61,12 +62,13 @@ function runPythonProcess(folderList, shift) {
 // Generalized function to handle the cron job workflow
 async function handleCronJob(shift) {
   try {
+    let current_date = new Date().toISOString().split("T")[0];
     // Step 1: Process folders
     console.time('Processing Time for bystronic12K data pull');
     await main();
     console.timeEnd('Processing Time for bystronic12K data pull');
     // Step 2: Collect Bystronic laser data
-    await processFolders(shift);
+    await processFolders(shift,current_date);
 
     // Step 3: Execute SQL queries if it's the right time
     if (shift === 'Shift2') {
