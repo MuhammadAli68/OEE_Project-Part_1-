@@ -132,7 +132,7 @@ if __name__ == "__main__":
     folders = json.loads(sys.argv[1])
     DayofWeek = int(sys.argv[2])
     ShiftNumber = sys.argv[3]
-    current_date = dt.datetime.now().date() # making this global so that all threads see the same date.
+    current_date = dt.datetime.strptime(sys.argv[4],'%Y-%m-%d').date() # dt.datetime.now().date() making this global so that all threads see the same date.
     print("current date: ",current_date)
 
     threads = []
