@@ -8,14 +8,14 @@ const { connectAndQuery } = require('./DataBaseQueries/DB.js');
 
 laser_folder_path_dir  = "../data/HSG/HSG Nest Run Data"; //"T:/HSG/HSG Nest Run Data"
 laser_folder_list = [
-  //"/HSG 1 Nest Run Data",
+  "/HSG 1 Nest Run Data",
   "/HSG 2 Nest Run Data",
   //"/HSG 3 Nest Run Data",
-  //"/HSG 4 Nest Run Data",
-  //"/HSG 5 Nest Run Data",
+  "/HSG 4 Nest Run Data",
+  "/HSG 5 Nest Run Data",
   "/HSG 6 Nest Run Data",
   "/HSG 7 Nest Run Data",
-  //"/HSG 8 Nest Run Data"
+  "/HSG 8 Nest Run Data"
 ];
 function getDayOfWeek() {
   const today = new Date();
