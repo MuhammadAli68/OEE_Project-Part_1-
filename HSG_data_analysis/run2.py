@@ -118,23 +118,23 @@ def worker(folder, DayofWeek, ShiftNumber):
 
 if __name__ == "__main__":
 #    folders = [
-#  "T:/HSG/HSG Nest Run Data/HSG 1 Nest Run Data",
-#  "T:/HSG/HSG Nest Run Data/HSG 2 Nest Run Data",
-  #"/HSG 3 Nest Run Data",
-#  "T:/HSG/HSG Nest Run Data/HSG 4 Nest Run Data",
-#  "T:/HSG/HSG Nest Run Data/HSG 5 Nest Run Data",
-#  "T:/HSG/HSG Nest Run Data/HSG 6 Nest Run Data",
-#  "T:/HSG/HSG Nest Run Data/HSG 7 Nest Run Data",
-#  "T:/HSG/HSG Nest Run Data/HSG 8 Nest Run Data"
+# "T:/HSG/HSG Nest Run Data/HSG 1 Nest Run Data",
+# "T:/HSG/HSG Nest Run Data/HSG 2 Nest Run Data",
+#  "/HSG 3 Nest Run Data",
+# "T:/HSG/HSG Nest Run Data/HSG 4 Nest Run Data",
+# "T:/HSG/HSG Nest Run Data/HSG 5 Nest Run Data",
+# "T:/HSG/HSG Nest Run Data/HSG 6 Nest Run Data",
+# "T:/HSG/HSG Nest Run Data/HSG 7 Nest Run Data",
+# "T:/HSG/HSG Nest Run Data/HSG 8 Nest Run Data"
 #]
-#    DayofWeek = 1
+#    DayofWeek = 2
 #    ShiftNumber = "Shift1"
+#    current_date = dt.datetime.now().date()
     folders = json.loads(sys.argv[1])
     DayofWeek = int(sys.argv[2])
     ShiftNumber = sys.argv[3]
-    current_date = dt.datetime.strptime(sys.argv[4],'%Y-%m-%d').date() # dt.datetime.now().date() making this global so that all threads see the same date.
+    current_date = dt.datetime.strptime(sys.argv[4],'%Y-%m-%d').date() # making this global so that all threads see the same date.
     print("current date: ",current_date)
-
     threads = []
     for folder in folders:
         thread = threading.Thread(target=worker, args=(folder, DayofWeek, ShiftNumber))
