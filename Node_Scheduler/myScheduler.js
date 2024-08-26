@@ -6,7 +6,7 @@ const spawn = require("child_process").spawn;
 const { main } = require('./BystronicDataExtraction/DataPull.js');
 const { connectAndQuery } = require('./DataBaseQueries/DB.js');
 
-laser_folder_path_dir  = "../data/HSG/HSG Nest Run Data"; //"T:/HSG/HSG Nest Run Data"
+laser_folder_path_dir  = "../data/HSG/HSG Nest Run Data"; // "T:/HSG/HSG Nest Run Data"
 laser_folder_list = [
   "/HSG 1 Nest Run Data",
   "/HSG 2 Nest Run Data",
@@ -17,16 +17,17 @@ laser_folder_list = [
   "/HSG 7 Nest Run Data",
   "/HSG 8 Nest Run Data"
 ];
+
 function getDayOfWeek() {
   const today = new Date();
-  return today.getDay();
+  return [today.getDay(),today.toISOString().split("T")[0]];
 }
 
 // Function to handle the async loop with delay
-async function processFolders(shift,current_date) {
+async function processFolders(shift,current_date,day_num) {
   console.time('Processing Time for batch size 20');
   try {
-    const result = await runPythonProcess(laser_folder_list, shift, current_date);
+    const result = await runPythonProcess(laser_folder_list, shift, current_date, day_num);
     console.log(result);
   } catch (error) {
     console.error(error);
@@ -35,12 +36,12 @@ async function processFolders(shift,current_date) {
 }
 
 // Function to run Python process and return a promise
-function runPythonProcess(folderList, shift, current_date) {
+function runPythonProcess(folderList, shift, current_date,day_num) {
   return new Promise((resolve, reject) => {
     const pythonProcess = spawn('python3.12', [
       "../HSG_data_analysis/run2.py",
       JSON.stringify(folderList.map(folder => laser_folder_path_dir + folder)),
-      getDayOfWeek(),
+      day_num,
       shift,
       current_date
     ]);
@@ -60,15 +61,14 @@ function runPythonProcess(folderList, shift, current_date) {
 }
 
 // Generalized function to handle the cron job workflow
-async function handleCronJob(shift) {
+async function handleCronJob(shift,current_date,day_num) {
   try {
-    let current_date = new Date().toISOString().split("T")[0];
     // Step 1: Process folders
     console.time('Processing Time for bystronic12K data pull');
     await main();
     console.timeEnd('Processing Time for bystronic12K data pull');
     // Step 2: Collect Bystronic laser data
-    await processFolders(shift,current_date);
+    await processFolders(shift,current_date,day_num);
 
     // Step 3: Execute SQL queries if it's the right time
     if (shift === 'Shift2') {
@@ -84,32 +84,48 @@ async function handleCronJob(shift) {
 // Schedule for Tuesday to Friday at 4am
 cron.schedule('0 4 * * 2-5', () => {
   console.log('Running at 4am Monday to Thursday');
-  handleCronJob("Shift0");
+  [day_num,current_date] = getDayOfWeek();
+  console.log("current date: ",current_date);
+  console.log("Day number: ",day_num);
+  handleCronJob("Shift0",current_date,day_num);
 });
 
 // Schedule for Monday to Thursday at 2pm
 cron.schedule('0 14 * * 1-4', () => {
   console.log('Running at 2pm Monday to Thursday');
-  handleCronJob("Shift1");
+  [day_num,current_date] = getDayOfWeek();
+  console.log("current date: ",current_date);
+  console.log("Day number: ",day_num);
+  handleCronJob("Shift1",current_date,day_num);
 });
 
 // Schedule for Monday to Thursday at 11 59 55pm. To compensate delay caused by Bystronic data extraction.
 cron.schedule('55 59 23 * * 1-4', () => {
   console.log('Running at 12am Monday to Thursday');
-  const shift = "Shift2";
-  handleCronJob("Shift2");
+  [day_num,current_date] = getDayOfWeek();
+  current_date = current_date.substring(0,8) + (Number(current_date.substring(8,10))-1).toString();
+  console.log("current date: ",current_date);
+  console.log("Day number: ",day_num);
+  handleCronJob("Shift2",current_date,day_num);
 });
 
 // Schedule for Friday at 12pm
 cron.schedule('0 12 * * 5', () => {
   console.log('Running at 12pm on Friday');
-  handleCronJob("Shift1");
+  [day_num,current_date] = getDayOfWeek();
+  console.log("current date: ",current_date);
+  console.log("Day number: ",day_num);
+  handleCronJob("Shift1",current_date,day_num);
 });
 
 // Schedule for Friday at 8pm
 cron.schedule('0 20 * * 5', () => {
   console.log('Running at 8pm on Friday');
-  handleCronJob("Shift2");
+  [day_num,current_date] = getDayOfWeek();
+  current_date = current_date.substring(0,8) + (Number(current_date.substring(8,10))-1).toString();
+  console.log("current date: ",current_date);
+  console.log("Day number: ",day_num);
+  handleCronJob("Shift2",current_date,day_num);
 });
 
 // const fs = require('fs');
