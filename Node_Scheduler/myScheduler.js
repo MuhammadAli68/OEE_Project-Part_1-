@@ -69,7 +69,6 @@ async function handleCronJob(shift,current_date,day_num) {
     console.timeEnd('Processing Time for bystronic12K data pull');
     // Step 2: Collect Bystronic laser data
     await processFolders(shift,current_date,day_num);
-
     // Step 3: Execute SQL queries if it's the right time
     if (shift === 'Shift2') {
       await connectAndQuery();
@@ -81,13 +80,22 @@ async function handleCronJob(shift,current_date,day_num) {
   }
 }
 
-// Schedule for Tuesday to Friday at 4am
-cron.schedule('0 4 * * 2-5', () => {
+// Schedule for Monday to Friday at 4am
+cron.schedule('0 4 * * 1-5', () => {
   console.log('Running at 4am Monday to Thursday');
   [day_num,current_date] = getDayOfWeek();
   console.log("current date: ",current_date);
   console.log("Day number: ",day_num);
-  handleCronJob("Shift0",current_date,day_num);
+  if(day_num == 1)
+  {
+    console.time('Processing Time for bystronic12K data pull');
+    main()
+    console.timeEnd('Processing Time for bystronic12K data pull');
+  }
+  else
+  {
+    handleCronJob("Shift0",current_date,day_num);
+  }
 });
 
 // Schedule for Monday to Thursday at 2pm

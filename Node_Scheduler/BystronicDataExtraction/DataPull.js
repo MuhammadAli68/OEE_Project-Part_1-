@@ -3,7 +3,7 @@ const { AttributeIds,  MessageSecurityMode, SecurityPolicy } = require("node-opc
 const sql = require('mssql');
 
 const config  = require('../DataBaseQueries/config.js');
-const endpointUrl = "opc.tcp://192.168.110.15:56000";
+const endpoints = [{"Bystronic12K":"opc.tcp://192.168.110.15:56000"}]; //,{"Bystronic10K":"opc.tcp://192.168.110.11:56000"}
 
 const connectionStrategy = {
     initialDelay: 1000,
@@ -21,69 +21,71 @@ async function main() {
             connectionStrategy: connectionStrategy,
             securityMode: MessageSecurityMode.None,
             securityPolicy: SecurityPolicy.None,
-            keepSessionAlive:false,
+            keepSessionAlive: false,
             endpointMustExist: false
         });
 
-        // step 1 : connect to OPC UA server
-        await client.connect(endpointUrl);
-        console.log("connected !");
+        for (const endpointUrl of endpoints) {
+            const machineName = Object.keys(endpointUrl)[0];
+            const url = endpointUrl[machineName];
 
-        // step 2 : createSession
-        const session = await client.createSession();
-        console.log("session created !");
+            // step 1 : connect to OPC UA server
+            await client.connect(url);
+            console.log("Connected to:", url);
 
-        // step 3 : read OperationHours and CuttingHours values
-        const dataValue1 = await session.read({
-            nodeId: "ns=2;s=Machine.OperationHours",
-            attributeId: AttributeIds.Value
-        });
-        console.log("Machine Operating hours = ", dataValue1.value.value);
-        let operation_hours = dataValue1.value.value;
+            // step 2 : createSession
+            const session = await client.createSession();
+            console.log("Session created!");
 
-        const dataValue2 = await session.read({
-            nodeId: "ns=2;s=Machine.CuttingHours",
-            attributeId: AttributeIds.Value
-        });
-        console.log("Laser Cutting hours = ", dataValue2.value.value);
-        let cutting_hours = dataValue2.value.value;
-        let Time = new Date(dataValue2.serverTimestamp).toLocaleString("en-US",{timeZone:"America/New_York",hour12: false}).replace(",","");
+            // step 3 : read OperationHours and CuttingHours values
+            const dataValue1 = await session.read({
+                nodeId: "ns=2;s=Machine.OperationHours",
+                attributeId: AttributeIds.Value
+            });
+            console.log("Machine Operating hours =", dataValue1.value.value);
 
-        let MachineID = "Bystronic12K";
-        let OperationHours = operation_hours;
-        let CuttingHours = cutting_hours;
-        let TimeOfData = Time;
+            const dataValue2 = await session.read({
+                nodeId: "ns=2;s=Machine.CuttingHours",
+                attributeId: AttributeIds.Value
+            });
+            console.log("Laser Cutting hours =", dataValue2.value.value);
 
-        // create connection with Azure SQL Database
-        var poolConnection = await sql.connect(config);
+            let Time = new Date(dataValue2.serverTimestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: false }).replace(",", "");
 
-        // Insert data into Azure SQL Database
-        const query = `INSERT INTO [dbo].[Bystronic12Koutput] (MachineID, OperationHours, CuttingHours, TimeOfData) 
-                       VALUES (@MachineID, @OperationHours, @CuttingHours, @TimeOfData);`;
-        
-        console.log('Executing query:', query); // Log the query
+            // create connection with Azure SQL Database
+            var poolConnection = await sql.connect(config);
 
-        let result = await poolConnection.request()
-            .input('MachineID', sql.VarChar, MachineID)
-            .input('OperationHours', sql.Float, OperationHours)
-            .input('CuttingHours', sql.Float, CuttingHours)
-            .input('TimeOfData', sql.VarChar, TimeOfData) //, sql.DateTime
-            .query(query);
-        
-        console.log('Query executed. Result:', result);
+            // Insert data into Azure SQL Database
+            const query = `INSERT INTO [dbo].[BystronicOutput] (MachineID, OperationHours, CuttingHours, TimeOfData) 
+                            VALUES (@MachineID, @OperationHours, @CuttingHours, @TimeOfData);`;
 
+            console.log('Executing query:', query);
 
-        console.log("done !");
-        // close opc ua session
-        await session.close();
+            let result = await poolConnection.request()
+                .input('MachineID', sql.VarChar, machineName)
+                .input('OperationHours', sql.Float, dataValue1.value.value)
+                .input('CuttingHours', sql.Float, dataValue2.value.value)
+                .input('TimeOfData', sql.VarChar, Time)
+                .query(query);
 
-        // disconnecting opc ua server
-        await client.disconnect();
+            console.log('Query executed. Result:', result);
 
-        // close connection with Database
-        poolConnection.close();
+            // close OPC UA session
+            await session.close();
+
+            // disconnecting from OPC UA server
+            await client.disconnect();
+            await timeout(100);
+        }
+
+        console.log("All operations completed!");
+
     } catch (err) {
         console.log("An error has occurred : ", err);
+    } finally {
+
+        // close connection with Database
+        await poolConnection.close();
     }
 }
 // main();
