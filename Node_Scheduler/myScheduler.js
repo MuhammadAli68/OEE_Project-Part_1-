@@ -5,12 +5,16 @@ const cron = require('node-cron');
 const spawn = require("child_process").spawn;
 const { main } = require('./BystronicDataExtraction/DataPull.js');
 const { connectAndQuery } = require('./DataBaseQueries/DB.js');
+const sql = require('mssql');
+const config  = require('./DataBaseQueries/config.js');
 
-laser_folder_path_dir  = "../data/HSG/HSG Nest Run Data"; // "T:/HSG/HSG Nest Run Data"
+const poolConnectionPromise = sql.connect(config);
+
+laser_folder_path_dir  = "../data/HSG/HSG Nest Run Data" ; // "T:/HSG/HSG Nest Run Data"
 laser_folder_list = [
   "/HSG 1 Nest Run Data",
   "/HSG 2 Nest Run Data",
-  //"/HSG 3 Nest Run Data",
+  "/HSG 3 Nest Run Data",
   "/HSG 4 Nest Run Data",
   "/HSG 5 Nest Run Data",
   "/HSG 6 Nest Run Data",
@@ -65,13 +69,13 @@ async function handleCronJob(shift,current_date,day_num) {
   try {
     // Step 1: Process folders
     console.time('Processing Time for bystronic12K data pull');
-    await main();
+    await main(poolConnectionPromise);
     console.timeEnd('Processing Time for bystronic12K data pull');
     // Step 2: Collect Bystronic laser data
     await processFolders(shift,current_date,day_num);
     // Step 3: Execute SQL queries if it's the right time
     if (shift === 'Shift2') {
-      await connectAndQuery();
+      await connectAndQuery(poolConnectionPromise);
     }
     
     console.log('All tasks completed successfully.');
@@ -82,7 +86,7 @@ async function handleCronJob(shift,current_date,day_num) {
 
 // Schedule for Monday to Friday at 4am
 cron.schedule('0 4 * * 1-5', () => {
-  console.log('Running at 4am Monday to Thursday');
+  console.log('Running at 4am Monday to Friday');
   [day_num,current_date] = getDayOfWeek();
   console.log("current date: ",current_date);
   console.log("Day number: ",day_num);
@@ -109,7 +113,7 @@ cron.schedule('0 14 * * 1-4', () => {
 
 // Schedule for Monday to Thursday at 11 59 55pm. To compensate delay caused by Bystronic data extraction.
 cron.schedule('55 59 23 * * 1-4', () => {
-  console.log('Running at 12am Monday to Thursday');
+  console.log('Running at 11:59:55pm Monday to Thursday');
   [day_num,current_date] = getDayOfWeek();
   current_date = current_date.substring(0,8) + (Number(current_date.substring(8,10))-1).toString();
   console.log("current date: ",current_date);

@@ -9,6 +9,11 @@ module.exports = {
         trustedConnection: false,
         encrypt: false
     },
+    pool: {
+        max: 10, // Increase max connections in the pool
+        min: 0,
+        idleTimeoutMillis: 30000 // Timeout for idle connections
+    }
 };
 
 // {

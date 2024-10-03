@@ -2,7 +2,7 @@ const node_opc = require('node-opcua-client');
 const { AttributeIds,  MessageSecurityMode, SecurityPolicy } = require("node-opcua-client");
 const sql = require('mssql');
 
-const config  = require('../DataBaseQueries/config.js');
+// const config  = require('../DataBaseQueries/config.js');
 const endpoints = [{"Bystronic12K":"opc.tcp://192.168.110.15:56000"}]; //,{"Bystronic10K":"opc.tcp://192.168.110.11:56000"}
 
 const connectionStrategy = {
@@ -14,7 +14,7 @@ async function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function main() {
+async function main(poolConnectionPromise) {
     try {
         const client = node_opc.OPCUAClient.create({
             applicationName: "MyClient",
@@ -50,11 +50,15 @@ async function main() {
             });
             console.log("Laser Cutting hours =", dataValue2.value.value);
 
-            let Time = new Date(dataValue2.serverTimestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: false }).replace(",", "");
-
+            //let Time = new Date(dataValue2.serverTimestamp).toLocaleString("en-US", { timeZone: "America/New_York", hour12: false }).replace(",", "");
+            let Time = new Date().toLocaleString("en-US", { timeZone: "America/New_York", hour12: false }).replace(",", "");
+            if(Time.substring(10,12) === "00" || Time.substring(10,12) === "24")
+            {
+                Time.replace(Time.substring(10),"23:59:55")
+            }
             // create connection with Azure SQL Database
-            var poolConnection = await sql.connect(config);
-
+            // var poolConnection = await sql.connect(config);
+            var poolConnection = await poolConnectionPromise;
             // Insert data into Azure SQL Database
             const query = `INSERT INTO [dbo].[BystronicOutput] (MachineID, OperationHours, CuttingHours, TimeOfData) 
                             VALUES (@MachineID, @OperationHours, @CuttingHours, @TimeOfData);`;
@@ -82,11 +86,11 @@ async function main() {
 
     } catch (err) {
         console.log("An error has occurred : ", err);
-    } finally {
+    } // finally {
 
-        // close connection with Database
-        await poolConnection.close();
-    }
+    //     // close connection with Database
+    //     await poolConnection.close();
+    // }
 }
 // main();
 module.exports = { main };

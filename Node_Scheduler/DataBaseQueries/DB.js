@@ -1,12 +1,12 @@
 const sql = require('mssql');
-const config = require('./config.js');
+// const config = require('./config.js');
 
 
-async function connectAndQuery() {
+async function connectAndQuery(poolConnectionPromise) {
     try {
         console.log("Starting...");
-        var poolConnection = await sql.connect(config);
-
+        // var poolConnection = await sql.connect(config);
+        var poolConnection = await poolConnectionPromise;
         console.log("Reading rows from the Table...");
         var resultSet = await poolConnection.request().query(`DROP TABLE IF EXISTS [dbo].[Bystronic12K_shifts];
 WITH daily_total_runtime_by_shift AS (
@@ -52,7 +52,7 @@ ALTER TABLE [dbo].[Bystronic12K] ADD  Utilization AS (
         console.log("rows affected: ", resultSet["rowsAffected"]);
 
         // close connection only when we're certain application is finished
-        poolConnection.close();
+       // poolConnection.close();
     } catch (err) {
         console.error(err.message);
     }
